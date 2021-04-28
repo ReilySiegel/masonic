@@ -1,0 +1,3 @@
+{:deps    {edu.wpi.teamo/project-mason {:local/root "ProjectMason/build/libs/ProjectMason.jar"}}
+ :aliases {:project-mason/run
+           {:exec-fn edu.wpi.teamo.masonic/project-mason}}}
