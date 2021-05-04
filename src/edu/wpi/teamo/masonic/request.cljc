@@ -7,12 +7,17 @@
             [edu.wpi.teamo.masonic.client.ui.material :as mui]
             [com.fulcrologic.fulcro.mutations :as m]
             [com.fulcrologic.fulcro.data-fetch :as df]
-            [com.fulcrologic.fulcro.algorithms.form-state :as fs])
-  #?(:clj (:import (edu.wpi.teamo.database.request ExtendedBaseRequest))))
+            [com.fulcrologic.fulcro.algorithms.form-state :as fs]
+            [clojure.string :as str]
+            [tick.alpha.api :as tick])
+  #?(:clj (:import
+           (java.util Date)
+           (java.time LocalDateTime Instant ZoneOffset)
+           (edu.wpi.teamo.database.request BaseRequest ExtendedBaseRequest))))
 
 (def outputs [::id       
               {::locations [::node/id]}
-              ::assigned 
+              {::assigned [::account/username]} 
               ::complete?
               ::details  
               ::due      
@@ -28,11 +33,21 @@
            .iterator
            iterator-seq
            (mapv (partial assoc {} ::node/id)))
-      ::assigned  (.getAssigned obj)
+      ::assigned  (mapv (partial assoc {} ::account/username) (str/split (.getAssigned obj) #","))
       ::complete? (.isComplete obj)
       ::details   (.getDetails obj)
-      ::due       (str (.getDue obj))
+      ::due       (.getDue obj)
       ::timestamp (str (.getTimestamp obj))}))
+
+#?(:clj
+   (defn ->BaseRequest [{::keys [id details locations assigned complete? due]}]
+     (prn (type due))
+     (BaseRequest. id
+                   details
+                   (.stream (map ::node/id locations))
+                   (str/join \, (map ::account/username assigned))
+                   complete?
+                   due)))
 
 
 (comp/defsc FormAccountsQuery [_ _]
@@ -56,6 +71,7 @@
          accounts ::account/all
          nodes    ::node/all}
         (comp/props this)]
+    (prn (type due))
     (comp/fragment
      (mui/grid {:item true :xs 12 :sm 6}
                (mui/auto-complete
@@ -93,7 +109,7 @@
                                       :renderInput #(mui/text-field (mui/merge* % {:fullWidth true}))
                                       :ampm        false
                                       :value       due
-                                      :onChange    #(m/set-value! this ::due %)}))
+                                      :onChange    #(m/set-value! this ::due (tick/date-time %))}))
      (mui/grid {:item true :xs 12 :sm 6}
                (mui/form-control-label
                 {:label   "Complete"

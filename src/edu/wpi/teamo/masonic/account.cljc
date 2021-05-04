@@ -18,7 +18,7 @@
 #?(:clj
    (pco/defresolver by-username [{::keys [username]}]
      {::pco/output output}
-     (account->m (Account/getByUsername "admin"))))
+     (account->m (Account/getByUsername username))))
 
 #?(:clj
    (pco/defresolver all []

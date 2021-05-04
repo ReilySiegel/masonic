@@ -11,7 +11,8 @@
             [com.fulcrologic.fulcro.algorithms.form-state :as fs]
             [com.fulcrologic.fulcro.algorithms.data-targeting :as dt]
             [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [tick.alpha.api :as tick])
   #?(:clj
      (:import edu.wpi.teamo.database.request.MedicineRequest)))
 
@@ -97,12 +98,20 @@
                        (fs/entity->pristine* [::request/id id]))))))
 
 
-(m/defmutation submit [{::request/keys [id]}]
-  (action [{:keys [state]}]
-          (swap! state (fn [s]
-                         (-> s
-                             (dt/integrate-ident* [::request/id id]
-                                                  :prepend [:ui/component ::page ::all]))))))
+#?(:clj
+   (pco/defmutation upsert [{::keys         [amount type]
+                             ::request/keys [id]
+                             :as            req}]
+     (.update (MedicineRequest. type amount (request/->BaseRequest req)))
+     {::request/id id})
+   :cljs
+   (m/defmutation upsert [{::request/keys [id]}]
+     (action [{:keys [state]}]
+             (swap! state (fn [s]
+                            (-> s
+                                (dt/integrate-ident* [::request/id id]
+                                                     :prepend [:ui/component ::page ::all])))))
+     (remote [_] true)))
 
 (comp/defsc Card [this {::keys         [type amount]
                         ::request/keys [id locations assigned due]}]
@@ -120,11 +129,9 @@
      (mui/typography {:variant :h5} (str type " - " amount))
      (mui/typography {:noWrap true} (str/join ", " (map ::account/name assigned)))
      (mui/typography {:noWrap true} (str/join ", " (map ::node/long-name locations)))
-     (when due (mui/typography {} (str "Due by: " (.toLocaleString due
-                                                                   "en-US"
-                                                                   #js {:dateStyle "long"
-                                                                        :timeStyle "short"
-                                                                        :hour12    false}))))))))
+     (when due (mui/typography {} (str "Due by: " (tick/format
+                                                   (tick.format/formatter "LLL d, yyyy HH:mm")
+                                                   due))))))))
 
 (def card (comp/factory Card {:keyfn ::request/id}))
 
@@ -141,7 +148,7 @@
    :will-enter    (fn [app _]
                     (dr/route-deferred
                      [:ui/component ::page]
-                     #(df/load! app ::all Card
+                     #(df/load! app ::all Form
                                 {:post-mutation        `dr/target-ready
                                  :post-mutation-params {:target [:ui/component ::page]}
                                  :target               [:ui/component ::page ::all]})))}
@@ -170,8 +177,8 @@
      {}
      (mui/button {:onClick #(comp/transact! this [(fs/reset-form! {:form-ident [::request/id
                                                                                 (::request/id form)]})
-                                                  (m/toggle {:field :ui/open?})])} "Cancel")
-     (mui/button {:onClick #(comp/transact! this [(submit form)
-                                                  (m/toggle {:field :ui/open?})])} "Submit")))))
+                                                  `(m/toggle {:field :ui/open?})])} "Cancel")
+     (mui/button {:onClick #(comp/transact! this [(upsert form)
+                                                  `(m/toggle {:field :ui/open?})])} "Submit")))))
 
 (def page (comp/factory Page))

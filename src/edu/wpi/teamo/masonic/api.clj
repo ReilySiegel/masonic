@@ -13,6 +13,7 @@
 
 (defmethod ig/init-key ::env [_ {}]
   (-> (pci/register [node/all node/by-id node/shortest-path edge/all edge/by-id map/db medicine/all
+                     medicine/upsert
                      sanitation/all account/by-username account/all account/full-name session/login])
       (p.connector/connect-env {::pvc/parser-id ::env})))
 
