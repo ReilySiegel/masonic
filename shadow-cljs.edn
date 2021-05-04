@@ -1,0 +1,8 @@
+{:deps true
+ :builds
+ {:frontend
+  {:target     :browser
+   :modules    {:main {:init-fn edu.wpi.teamo.masonic.client/init!}}
+   :output-dir "resources/public/js"
+   :devtools   {:after-load edu.wpi.teamo.masonic.client/refresh!
+                :preloads   [com.fulcrologic.fulcro.inspect.preload]}}}}

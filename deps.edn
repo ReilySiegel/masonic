@@ -1,3 +1,15 @@
-{:deps    {edu.wpi.teamo/project-mason {:local/root "ProjectMason/build/libs/ProjectMason.jar"}}
- :aliases {:project-mason/run
+{:paths   ["src" "resources"]
+ :deps    {edu.wpi.teamo/project-mason      {:local/root "ProjectMason/build/libs/ProjectMason.jar"}
+           com.wsscode/pathom3              {:git/url "https://github.com/wilkerlucio/pathom3"
+                                             :sha     "5c5f6baae98f9cb7c7f76da09b903e17ff67482b"}
+           com.wsscode/pathom-viz-connector {:mvn/version "RELEASE"}
+           org.clojure/clojurescript        {:mvn/version "1.10.844"}
+           http-kit/http-kit                {:mvn/version "2.5.0"}
+           ring/ring                        {:mvn/version "1.8.2"}
+           ring/ring-defaults               {:mvn/version "0.3.2"}
+           com.fulcrologic/fulcro           {:mvn/version "3.4.12"}
+           hiccup/hiccup                    {:mvn/version "1.0.5"}
+           thheller/shadow-cljs             {:mvn/version "2.12.5"}
+           integrant/integrant              {:mvn/version "0.8.0"}}
+ :aliases {:masonic
            {:exec-fn edu.wpi.teamo.masonic/project-mason}}}
