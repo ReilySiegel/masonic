@@ -3,11 +3,18 @@
             [edu.wpi.teamo.masonic.client.ui.bar :as bar]
             [edu.wpi.teamo.masonic.request :as request]
             [edu.wpi.teamo.masonic.request.medicine :as medicine]
-            [edu.wpi.teamo.masonic.client.ui.material :as m]))
+            [edu.wpi.teamo.masonic.client.ui.material :as m]
+            [edu.wpi.teamo.masonic.client.ui.router :as router]))
 
-(comp/defsc Root [this {::medicine/keys [page]}]
-  {:query         [{::medicine/page (comp/get-query medicine/Page)}]
-   :initial-state {::medicine/page {}}}
+(comp/defsc Root [this {::bar/keys      [bar]
+                        ::medicine/keys [page]
+                        ::router/keys   [router]}]
+  {:query         [{::bar/bar (comp/get-query bar/AppBar)}
+                   {::router/router (comp/get-query router/Router)}
+                   {::medicine/page (comp/get-query medicine/Page)}]
+   :initial-state {::bar/bar       {}
+                   ::medicine/page {}
+                   ::router/router {}}}
   (m/styles-provider
    {:injectFirst true}
    (m/theme-provider
@@ -35,7 +42,7 @@
      {:dateAdapter m/adapter-date-fns}
      (comp/fragment
       (m/css-baseline)
-      (bar/app-bar {})
+      (bar/app-bar bar)
       (m/container
        {:sx {:mt 2}}
-       (medicine/page page)))))))
+       (router/router router)))))))

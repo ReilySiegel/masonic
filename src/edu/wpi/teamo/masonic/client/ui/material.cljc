@@ -20,6 +20,7 @@
               ["@material-ui/icons/AssignmentLate" :default AssignmentLateIcon]
               ["@material-ui/icons/AssignmentReturn" :default AssignmentReturnIcon]
               ["@material-ui/icons/AssignmentReturned" :default AssignmentReturnedIcon]
+              ["@material-ui/icons/LocalPharmacy" :default LocalPharmacyIcon]
               ["@material-ui/lab/AdapterDateFns" :default AdapterDateFns]
               ["@material-ui/lab/LocalizationProvider" :default LocalizationProvider]])
    [com.fulcrologic.fulcro.algorithms.react-interop :as interop])
@@ -78,6 +79,7 @@
 (def assignment-late-icon (interop/react-factory #?(:cljs AssignmentLateIcon :clj nil)))
 (def assignment-return-icon (interop/react-factory #?(:cljs AssignmentReturnIcon :clj nil)))
 (def assignment-returned-icon (interop/react-factory #?(:cljs AssignmentReturnedIcon :clj nil)))
+(def local-pharmacy-icon (interop/react-factory #?(:cljs LocalPharmacyIcon :clj nil)))
 
 (def styles-provider (interop/react-factory #?(:cljs mui/StylesProvider :clj nil)))
 (def theme-provider (interop/react-factory  #?(:cljs styles/ThemeProvider :clj nil)))

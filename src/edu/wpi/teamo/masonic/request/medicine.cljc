@@ -10,6 +10,7 @@
             [edu.wpi.teamo.masonic.client.ui.material :as mui]
             [com.fulcrologic.fulcro.algorithms.form-state :as fs]
             [com.fulcrologic.fulcro.algorithms.data-targeting :as dt]
+            [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [clojure.string :as str])
   #?(:clj
      (:import edu.wpi.teamo.database.request.MedicineRequest)))
@@ -35,7 +36,8 @@
                         accounts       ::account/all
                         nodes          ::node/all}]
   {:query             [::amount ::type
-                       ::request/id ::request/assigned ::request/locations ::request/complete?
+                       ::request/id ::request/assigned
+                       {::request/locations [::node/id ::node/long-name]} ::request/complete?
                        ::request/details ::request/due
                        fs/form-config-join
                        {[::account/all '_] (comp/get-query request/FormAccountsQuery)}
@@ -84,7 +86,7 @@
               {:renderInput          #(mui/text-field
                                        (mui/merge* % {:label "Location"}))
                :multiple             true
-               :value                (map second locations)
+               :value                (map ::node/id locations)
                :onChange             (fn [_ v]
                                        (m/set-value! this
                                                      ::request/locations
@@ -190,7 +192,17 @@
                    {::form (comp/get-query Form)}
                    {::all (comp/get-query Card)}]
    :ident         (fn [] [:ui/component ::page])
-   :initial-state {:ui/open? false}}
+   :initial-state {:ui/open? false}
+   :route-segment ["request" "medicine"]
+   :label         "Medicine Request"
+   :icon          (mui/local-pharmacy-icon {})
+   :will-enter    (fn [app _]
+                    (dr/route-deferred
+                     [:ui/component ::page]
+                     #(df/load! app ::all Card
+                                {:post-mutation        `dr/target-ready
+                                 :post-mutation-params {:target [:ui/component ::page]}
+                                 :target               [:ui/component ::page ::all]})))}
   (comp/fragment
    (mui/grid
     {:container true :spacing 4}
