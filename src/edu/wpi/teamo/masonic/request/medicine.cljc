@@ -31,21 +31,12 @@
                  iterator-seq
                  (mapv medicine-request->m))}))
 
-(comp/defsc Form [this {::keys         [amount type]
-                        ::request/keys [assigned locations complete? details due]
-                        accounts       ::account/all
-                        nodes          ::node/all}]
-  {:query             [::amount ::type
-                       ::request/id ::request/assigned
-                       {::request/locations [::node/id ::node/long-name]} ::request/complete?
-                       ::request/details ::request/due
-                       fs/form-config-join
-                       {[::account/all '_] (comp/get-query request/FormAccountsQuery)}
-                       {[::node/all '_] (comp/get-query request/FormNodesQuery)}]
+(comp/defsc Form [this {::keys [amount type]}]
+  {:query             (fn [] (into request/form-query
+                                   [::amount ::type]))
    :ident             ::request/id
-   :form-fields       #{::request/assigned ::request/locations ::request/complete? ::request/details
-                        ::request/due ::amount ::type}
-   :initial-state     {}
+   :form-fields       (into request/form-fields #{::amount ::type})
+   :initial-state     (fn [_] {})
    :componentDidMount (fn [this {accounts ::account/all
                                  nodes    ::node/all}]
                         (when-not (and (seq accounts) (seq nodes))
@@ -66,56 +57,7 @@
                               :fullWidth true
                               :value     amount
                               :onChange  #(m/set-string! this ::amount :event %)}))
-   (mui/grid {:item true :xs 12 :sm 6}
-             (mui/auto-complete
-              {:renderInput          #(mui/text-field
-                                       (mui/merge* % {:label "Assigned"}))
-               :multiple             true
-               :value                (map second assigned)
-               :onChange             (fn [_ v]
-                                       (m/set-value! this ::request/assigned
-                                                     (mapv (partial conj [::account/username])
-                                                           (mui/->clj v))))
-               :disableCloseOnSelect true
-               :getOptionLabel       (fn [id]
-                                       (::account/name
-                                        (first (filter (comp #{id} ::account/username) accounts))))
-               :options              (or (map ::account/username accounts) [])}))
-   (mui/grid {:item true :xs 12 :sm 6}
-             (mui/auto-complete
-              {:renderInput          #(mui/text-field
-                                       (mui/merge* % {:label "Location"}))
-               :multiple             true
-               :value                (map ::node/id locations)
-               :onChange             (fn [_ v]
-                                       (m/set-value! this
-                                                     ::request/locations
-                                                     (mapv (partial conj [::node/id])
-                                                           (mui/->clj v))))
-               :disableCloseOnSelect true
-               :getOptionLabel       (fn [id]
-                                       (let [node (first (filter (comp #{id} ::node/id) nodes))]
-                                         (str (::node/long-name node) " (" (::node/id node) ")")))
-               :options              (or  (map ::node/id nodes) [])}))
-   (mui/grid {:item true :xs 12 :sm 6}
-             (mui/date-time-picker {:label       "Due"
-                                    :renderInput #(mui/text-field (mui/merge* % {:fullWidth true}))
-                                    :ampm        false
-                                    :value       due
-                                    :onChange    #(m/set-value! this ::request/due %)}))
-   (mui/grid {:item true :xs 12 :sm 6}
-             (mui/form-control-label
-              {:label   "Complete"
-               :control (mui/checkbox {:checked  complete?
-                                       :onChange #(m/set-value! this
-                                                                ::request/complete?
-                                                                (.. % -target -checked))})}))
-   (mui/grid {:item true :xs 12}
-             (mui/text-field {:label     "Details"
-                              :fullWidth true
-                              :multiline true
-                              :value     details
-                              :onChange  #(m/set-string! this ::request/details :event %)}))))
+   (request/form-elements this)))
 
 (def form (comp/factory Form))
 
