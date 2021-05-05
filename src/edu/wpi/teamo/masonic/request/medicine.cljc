@@ -12,7 +12,8 @@
             [com.fulcrologic.fulcro.algorithms.data-targeting :as dt]
             [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [clojure.string :as str]
-            [tick.alpha.api :as tick])
+            [tick.alpha.api :as tick]
+            [clojure.spec.alpha :as s])
   #?(:clj
      (:import edu.wpi.teamo.database.request.MedicineRequest)))
 
@@ -95,7 +96,8 @@
                        (assoc-in [:ui/component ::page ::form] [::request/id id])
                        (assoc-in [:ui/component ::page :ui/open?] true)
                        (fs/add-form-config* Form [::request/id id])
-                       (fs/entity->pristine* [::request/id id]))))))
+                       (fs/entity->pristine* [::request/id id])
+                       (fs/mark-complete* [::request/id id]))))))
 
 
 #?(:clj
@@ -159,7 +161,9 @@
     {:open      open?
      :fullWidth true
      :maxWidth  :md
-     :onClose   #(m/toggle! this :ui/open?)}
+     :onClose   #(comp/transact! this [(fs/reset-form! {:form-ident [::request/id
+                                                                     (::request/id form)]})
+                                       `(m/toggle {:field :ui/open?})])}
     (mui/dialog-content
      {}
      (mui/grid
@@ -168,10 +172,12 @@
       (edu.wpi.teamo.masonic.request.medicine/form form)))
     (mui/dialog-actions
      {}
-     (mui/button {:onClick #(comp/transact! this [(fs/reset-form! {:form-ident [::request/id
-                                                                                (::request/id form)]})
-                                                  `(m/toggle {:field :ui/open?})])} "Cancel")
-     (mui/button {:onClick #(comp/transact! this [(upsert form)
-                                                  `(m/toggle {:field :ui/open?})])} "Submit")))))
+     (mui/button {:disabled (not (fs/dirty? form))
+                  :onClick  #(comp/transact! this [(fs/reset-form! {:form-ident [::request/id
+                                                                                 (::request/id form)]})
+                                                   `(m/toggle {:field :ui/open?})])} "Cancel")
+     (mui/button {:disabled (not= :valid (fs/get-spec-validity form ::request/due))
+                  :onClick  #(comp/transact! this [(upsert form)
+                                                   `(m/toggle {:field :ui/open?})])} "Submit")))))
 
 (def page (comp/factory Page))
