@@ -44,9 +44,3 @@
               (map ::id)
               (map (partial get idx)))
              items))))
-
-#?(:clj
-   (pco/defmutation shortest-path [{::keys [start end]}]
-     {::pco/output [{::path [::id]}]}
-     {::path (mapv (fn [^AlgoNode an] {::id (.getID an)})
-                   (.getPath map/a* start end))}))

@@ -107,7 +107,10 @@
                                       :renderInput #(mui/text-field (mui/merge* % {:fullWidth true}))
                                       :ampm        false
                                       :value       due
-                                      :onChange    #(m/set-value! this ::due (tick/date-time %))}))
+                                      :onChange    #(m/set-value! this ::due
+                                                                  (try (tick/date-time %)
+                                                                       (catch :default e
+                                                                         nil)))}))
      (mui/grid {:item true :xs 12 :sm 6}
                (mui/form-control-label
                 {:label   "Complete"
