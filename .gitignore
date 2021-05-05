@@ -4,3 +4,4 @@ resources/public/js
 /.shadow-cljs/
 /.nrepl-port
 /.cpcache/
+/masonic.jar

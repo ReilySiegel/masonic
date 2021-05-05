@@ -15,4 +15,9 @@
  :aliases {:masonic
            {:exec-fn edu.wpi.teamo.masonic/start!}
            :masonic-headless
-           {:exec-fn edu.wpi.teamo.masonic/start-headless!}}}
+           {:exec-fn edu.wpi.teamo.masonic/start-headless!}
+           :uberjar {:replace-deps {com.github.seancorfield/depstar {:mvn/version "2.0.216"}}
+                     :exec-fn      hf.depstar/uberjar
+                     :exec-args    {:aot        true
+                                    :main-class edu.wpi.teamo.masonic
+                                    :jar        "masonic.jar"}}}}
