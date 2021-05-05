@@ -37,11 +37,10 @@
       ::complete? (.isComplete obj)
       ::details   (.getDetails obj)
       ::due       (.getDue obj)
-      ::timestamp (str (.getTimestamp obj))}))
+      ::timestamp (.getTimestamp obj)}))
 
 #?(:clj
    (defn ->BaseRequest [{::keys [id details locations assigned complete? due]}]
-     (prn (type due))
      (BaseRequest. id
                    details
                    (.stream (map ::node/id locations))
@@ -71,7 +70,6 @@
          accounts ::account/all
          nodes    ::node/all}
         (comp/props this)]
-    (prn (type due))
     (comp/fragment
      (mui/grid {:item true :xs 12 :sm 6}
                (mui/auto-complete
@@ -123,3 +121,16 @@
                                 :multiline true
                                 :value     details
                                 :onChange  #(m/set-string! this ::details :event %)})))))
+
+(def card-query [::id ::due ::complete?
+                 {::assigned [:account/username ::account/name]}
+                 {::locations [::node/id ::node/long-name]}])
+
+(defn card-elements [this]
+  (let [{::keys [assigned locations due]} (comp/props this)]
+    (comp/fragment
+     (mui/typography {:noWrap true} (str/join ", " (map ::account/name assigned)))
+     (mui/typography {:noWrap true} (str/join ", " (map ::node/long-name locations)))
+     (when due (mui/typography {} (str "Due by: " (tick/format
+                                                   (tick.format/formatter "LLL d, yyyy HH:mm")
+                                                   due)))))))

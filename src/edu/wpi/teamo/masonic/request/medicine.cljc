@@ -114,11 +114,8 @@
      (remote [_] true)))
 
 (comp/defsc Card [this {::keys         [type amount]
-                        ::request/keys [id locations assigned due]}]
-  {:query [::type ::amount
-           ::request/id ::request/due ::request/complete?
-           {::request/assigned [:account/username ::account/name]}
-           {::request/locations [::node/id ::node/long-name]}]
+                        ::request/keys [id]}]
+  {:query (fn [] (into request/card-query [::type ::amount]))
    :ident ::request/id}
   (mui/grid
    {:item true :xs 12 :sm 4}
@@ -127,11 +124,7 @@
     (mui/card-content
      {}
      (mui/typography {:variant :h5} (str type " - " amount))
-     (mui/typography {:noWrap true} (str/join ", " (map ::account/name assigned)))
-     (mui/typography {:noWrap true} (str/join ", " (map ::node/long-name locations)))
-     (when due (mui/typography {} (str "Due by: " (tick/format
-                                                   (tick.format/formatter "LLL d, yyyy HH:mm")
-                                                   due))))))))
+     (request/card-elements this)))))
 
 (def card (comp/factory Card {:keyfn ::request/id}))
 
