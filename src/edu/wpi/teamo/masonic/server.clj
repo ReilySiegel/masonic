@@ -46,6 +46,7 @@
 
 
 (defmethod ig/init-key ::http [_ {::keys [port env]}]
+  (println "Running Web UI on port" port)
   (http/run-server (-> index-handler
                        (wrap-api "/api" env)
                        (fm/wrap-transit-params)

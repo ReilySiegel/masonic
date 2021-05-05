@@ -6,20 +6,39 @@
   (:import edu.wpi.teamo.Main))
 
 (def config
-  {::server/http {::server/port 3000
-                  ::server/env  (ig/ref ::api/env)}
-   ::api/env     {}})
+  {::server/http   {::server/port 3000
+                    ::server/env  (ig/ref ::api/env)}
+   ::api/env       {}
+   ::project-mason {}})
 
 (def system (volatile! nil))
 
-(defn project-mason [args]
-  (Main/main (make-array String 0)))
+(defmethod ig/init-key ::project-mason [_ _]
+  (future
+    (try (Main/main (make-array String 0))
+         (catch Exception e))
+    (System/exit 0)))
 
-(defn restart! []
-  (types/install!)
-  (when @system
-    (vswap! system ig/halt!))
-  (vreset! system (ig/init config)))
+(defmethod ig/halt-key! ::project-mason [_ f]
+  (future-cancel f))
+
+(defn start!
+  ([args] (start!))
+  ([]
+   (types/install!)
+   (when @system
+     (vswap! system ig/halt!))
+   (vreset! system (ig/init config))))
+
+(defn start-headless!
+  ([args] (start-headless!))
+  ([]
+   (types/install!)
+   (when @system
+     (vswap! system ig/halt!))
+   (vreset! system (ig/init config [::server/http ::api/env]))))
+
 
 (comment
-  (restart!))
+  (start!)
+  (start-headless!))

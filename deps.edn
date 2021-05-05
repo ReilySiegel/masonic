@@ -13,4 +13,6 @@
            integrant/integrant              {:mvn/version "0.8.0"}
            tick/tick                        {:mvn/version "0.4.31-alpha"}}
  :aliases {:masonic
-           {:exec-fn edu.wpi.teamo.masonic/project-mason}}}
+           {:exec-fn edu.wpi.teamo.masonic/start!}
+           :masonic-headless
+           {:exec-fn edu.wpi.teamo.masonic/start-headless!}}}
