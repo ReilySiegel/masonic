@@ -33,6 +33,7 @@
 (def box (interop/react-factory #?(:cljs mui/Box :clj nil)))
 (def button (interop/react-factory #?(:cljs mui/Button :clj nil)))
 (def card (interop/react-factory #?(:cljs mui/Card :clj nil)))
+(def card-action-area (interop/react-factory #?(:cljs mui/CardActionArea :clj nil)))
 (def card-actions (interop/react-factory #?(:cljs mui/CardActions :clj nil)))
 (def card-content (interop/react-factory #?(:cljs mui/CardContent :clj nil)))
 (def card-media (interop/react-factory #?(:cljs mui/CardMedia :clj nil)))

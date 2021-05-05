@@ -3,6 +3,8 @@
             [edu.wpi.teamo.masonic.request :as request]
             [edu.wpi.teamo.masonic.account :as account]
             [edu.wpi.teamo.masonic.map.node :as node]
+            [edu.wpi.teamo.masonic.client.ui.form :as form]
+            [edu.wpi.teamo.masonic.specs :as specs]
             [com.fulcrologic.fulcro.components :as comp]
             [com.fulcrologic.fulcro.mutations :as m]
             [com.fulcrologic.fulcro.algorithms.merge :as merge]
@@ -16,6 +18,9 @@
             [clojure.spec.alpha :as s])
   #?(:clj
      (:import edu.wpi.teamo.database.request.MedicineRequest)))
+
+(s/def ::type ::specs/non-empty-string)
+(s/def ::amount ::specs/non-empty-string)
 
 #?(:clj
    (defn medicine-request->m [^MedicineRequest obj]
@@ -33,73 +38,6 @@
                  iterator-seq
                  (mapv medicine-request->m))}))
 
-(comp/defsc Form [this {::keys [amount type]}]
-  {:query             (fn [] (into request/form-query
-                                   [::amount ::type]))
-   :ident             ::request/id
-   :form-fields       (into request/form-fields #{::amount ::type})
-   :initial-state     (fn [_] {})
-   :componentDidMount (fn [this {accounts ::account/all
-                                 nodes    ::node/all}]
-                        (when-not (and (seq accounts) (seq nodes))
-                          (df/load! this ::account/all request/FormAccountsQuery)
-                          (df/load! this ::node/all request/FormNodesQuery)))}
-  (comp/fragment
-   (mui/grid {:item true
-              :xs   12
-              :sm   6}
-             (mui/text-field {:label     "Type"
-                              :fullWidth true
-                              :value     type
-                              :onChange  #(m/set-string! this ::type :event %)}))
-   (mui/grid {:item true
-              :xs   12
-              :sm   6}
-             (mui/text-field {:label     "Amount"
-                              :fullWidth true
-                              :value     amount
-                              :onChange  #(m/set-string! this ::amount :event %)}))
-   (request/form-elements this)))
-
-(def form (comp/factory Form))
-
-(defn add-form* [state id]
-  (let [ident   [::request/id id]
-        request {::request/id        id
-                 ::request/assigned  []
-                 ::request/locations []
-                 ::request/complete? false
-                 ::request/due       nil
-                 ::request/details   ""
-                 ::type              ""
-                 ::amount            ""}]
-    (-> state 
-        (update-in ident merge request))))
-
-
-(m/defmutation create [_]
-  (action [{:keys [state]}]
-          (let [id (str #?(:cljs (random-uuid)))]
-            (swap! state
-                   (fn [s]
-                     (-> s
-                         (add-form* id)
-                         (assoc-in [:ui/component ::page ::form] [::request/id id])
-                         (assoc-in [:ui/component ::page :ui/open?] true)
-                         (fs/add-form-config* Form [::request/id id])))))))
-
-(m/defmutation edit [{::request/keys [id]}]
-  (action [{:keys [state]}]
-          (swap! state
-                 (fn [s]
-                   (-> s
-                       (assoc-in [:ui/component ::page ::form] [::request/id id])
-                       (assoc-in [:ui/component ::page :ui/open?] true)
-                       (fs/add-form-config* Form [::request/id id])
-                       (fs/entity->pristine* [::request/id id])
-                       (fs/mark-complete* [::request/id id]))))))
-
-
 #?(:clj
    (pco/defmutation upsert [{::keys         [amount type]
                              ::request/keys [id]
@@ -115,6 +53,27 @@
                                                      :prepend [:ui/component ::page ::all])))))
      (remote [_] true)))
 
+(comp/defsc Form [this {::keys [amount type]}]
+  {:query             (fn [] (into request/form-query
+                                   [::amount ::type]))
+   :ident             ::request/id
+   :form-fields       (into request/form-fields #{::amount ::type})
+   :componentDidMount request/form-did-mount}
+  (comp/fragment
+   (mui/grid {:item true
+              :xs   12
+              :sm   6}
+             (form/text-field this {::form/field ::type
+                                    ::form/label "Type"}))
+   (mui/grid {:item true
+              :xs   12
+              :sm   6}
+             (form/text-field this {::form/field ::amount
+                                    ::form/label "Amount"}))
+   (request/form-elements this)))
+
+(def form (comp/factory Form))
+
 (comp/defsc Card [this {::keys         [type amount]
                         ::request/keys [id]}]
   {:query (fn [] (into request/card-query [::type ::amount]))
@@ -122,11 +81,16 @@
   (mui/grid
    {:item true :xs 12 :sm 4}
    (mui/card
-    {:onClick #(comp/transact! this [(edit {::request/id id})])}
-    (mui/card-content
+    {:onClick #(comp/transact! this [(request/edit {::request/id       id
+                                                    ::request/form     Form
+                                                    ::request/form-key ::form
+                                                    ::request/page-key ::page})])}
+    (mui/card-action-area
      {}
-     (mui/typography {:variant :h5} (str type " - " amount))
-     (request/card-elements this)))))
+     (mui/card-content
+      {}
+      (mui/typography {:variant :h6 :noWrap true} (str type " - " amount))
+      (request/card-elements this))))))
 
 (def card (comp/factory Card {:keyfn ::request/id}))
 
@@ -155,7 +119,12 @@
              :sx      {:position :absolute
                        :bottom   32
                        :right    32}
-             :onClick #(comp/transact! this [(create)])}
+             :onClick #(comp/transact! this [(request/create {::request/form     Form
+                                                              ::request/form-key ::form
+                                                              ::request/page-key ::page
+                                                              ::request/defaults
+                                                              {::type   ""
+                                                               ::amount ""}})])}
             (mui/add-icon {}))
    (mui/dialog
     {:open      open?
@@ -170,14 +139,6 @@
       {:container true
        :spacing   2}
       (edu.wpi.teamo.masonic.request.medicine/form form)))
-    (mui/dialog-actions
-     {}
-     (mui/button {:disabled (not (fs/dirty? form))
-                  :onClick  #(comp/transact! this [(fs/reset-form! {:form-ident [::request/id
-                                                                                 (::request/id form)]})
-                                                   `(m/toggle {:field :ui/open?})])} "Cancel")
-     (mui/button {:disabled (not= :valid (fs/get-spec-validity form ::request/due))
-                  :onClick  #(comp/transact! this [(upsert form)
-                                                   `(m/toggle {:field :ui/open?})])} "Submit")))))
+    (form/dialog-actions this Form form upsert))))
 
 (def page (comp/factory Page))
