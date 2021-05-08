@@ -1,10 +1,12 @@
 (ns edu.wpi.teamo.masonic.client.ui.router
-  (:require [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
-            [edu.wpi.teamo.masonic.request.medicine :as medicine]
+  (:require [com.fulcrologic.fulcro.components :as comp]
+            [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [edu.wpi.teamo.masonic.client.ui.home :as home]
-            [com.fulcrologic.fulcro.components :as comp]))
+            [edu.wpi.teamo.masonic.request.laundry :as laundry]
+            [edu.wpi.teamo.masonic.request.medicine :as medicine]
+            [edu.wpi.teamo.masonic.request.sanitation :as sanitation]))
 
 (dr/defrouter Router [this props]
-  {:router-targets [home/Page medicine/Page]})
+  {:router-targets [home/Page laundry/Page medicine/Page sanitation/Page]})
 
 (def router (comp/factory Router))

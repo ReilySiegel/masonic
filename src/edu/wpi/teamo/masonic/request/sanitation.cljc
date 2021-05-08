@@ -1,4 +1,4 @@
-(ns edu.wpi.teamo.masonic.request.medicine
+(ns edu.wpi.teamo.masonic.request.sanitation
   (:require [com.wsscode.pathom3.connect.operation :as pco]
             [edu.wpi.teamo.masonic.request :as request]
             [edu.wpi.teamo.masonic.account :as account]
@@ -15,33 +15,29 @@
             [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [clojure.string :as str]
             [clojure.spec.alpha :as s])
-  #?(:clj
-     (:import edu.wpi.teamo.database.request.MedicineRequest)))
-
-(s/def ::type ::specs/non-empty-string)
-(s/def ::amount ::specs/non-empty-string)
+  
+  #?(:clj (:import edu.wpi.teamo.database.request.SanitationRequest)))
 
 #?(:clj
-   (defn medicine-request->m [^MedicineRequest obj]
+   (defn request->m [^SanitationRequest obj]
      (merge
       (request/request->m obj)
-      {::type   (.getType obj)
-       ::amount (.getAmount obj)})))
+      {::recurring? (.isRecurring obj)})))
 
 #?(:clj
    (pco/defresolver all []
-     {::pco/output [{::all (into request/outputs [::type
-                                                  ::amount])}]}
-     {::all (->> (MedicineRequest/getAll)
+     {::pco/output [{::all (into request/outputs [::recurring?])}]}
+     {::all (->> (SanitationRequest/getAll)
                  (.iterator)
                  iterator-seq
-                 (mapv medicine-request->m))}))
+                 (mapv request->m))}))
 
 #?(:clj
-   (pco/defmutation upsert [{::keys         [amount type]
+   (pco/defmutation upsert [{::keys         [recurring?]
                              ::request/keys [id]
                              :as            req}]
-     (.update (MedicineRequest. type amount (request/->BaseRequest req)))
+     (prn req)
+     (.update (SanitationRequest. recurring? (request/->BaseRequest req)))
      {::request/id id})
    :cljs
    (m/defmutation upsert [{::request/keys [id]}]
@@ -52,30 +48,19 @@
                                                      :prepend [:ui/component ::page ::all])))))
      (remote [_] true)))
 
-(comp/defsc Form [this {::keys [amount type]}]
+(comp/defsc Form [this {::keys [recurring?]}]
   {:query             (fn [] (into request/form-query
-                                   [::amount ::type]))
+                                   [::recurring?]))
    :ident             ::request/id
-   :form-fields       (into request/form-fields #{::amount ::type})
+   :form-fields       (into request/form-fields #{::recurring?})
    :componentDidMount request/form-did-mount}
   (comp/fragment
-   (mui/grid {:item true
-              :xs   12
-              :sm   6}
-             (form/text-field this {::form/field ::type
-                                    ::form/label "Type"}))
-   (mui/grid {:item true
-              :xs   12
-              :sm   6}
-             (form/text-field this {::form/field ::amount
-                                    ::form/label "Amount"}))
    (request/form-elements this)))
 
 (def form (comp/factory Form))
 
-(comp/defsc Card [this {::keys         [type amount]
-                        ::request/keys [id]}]
-  {:query (fn [] (into request/card-query [::type ::amount]))
+(comp/defsc Card [this {::request/keys [id]}]
+  {:query (fn [] request/card-query)
    :ident ::request/id}
   (mui/grid
    {:item true :xs 12 :sm 4}
@@ -88,7 +73,6 @@
      {}
      (mui/card-content
       {}
-      (mui/typography {:variant :h6 :noWrap true} (str type " - " amount))
       (request/card-elements this))))))
 
 (def card (comp/factory Card {:keyfn ::request/id}))
@@ -100,9 +84,9 @@
                    {::all (comp/get-query Card)}]
    :ident         (fn [] [:ui/component ::page])
    :initial-state {:ui/open? false}
-   :route-segment ["request" "medicine"]
-   :label         "Medicine Request"
-   :icon          (mui/local-pharmacy-icon {})
+   :route-segment ["request" "sanitation"]
+   :label         "Sanitation Request"
+   :icon          (mui/clean-hands-icon {})
    :will-enter    (fn [app _]
                     (dr/route-deferred
                      [:ui/component ::page]
@@ -122,8 +106,7 @@
                                                               ::request/form-key ::form
                                                               ::request/page-key ::page
                                                               ::request/defaults
-                                                              {::type   ""
-                                                               ::amount ""}})])}
+                                                              {::recurring? false}})])}
             (mui/add-icon {}))
    (mui/dialog
     {:open      open?
@@ -137,7 +120,7 @@
      (mui/grid
       {:container true
        :spacing   2}
-      (edu.wpi.teamo.masonic.request.medicine/form form)))
+      (edu.wpi.teamo.masonic.request.sanitation/form form)))
     (form/dialog-actions this Form form upsert))))
 
 (def page (comp/factory Page))

@@ -145,8 +145,8 @@
 (defn card-elements [this]
   (let [{::keys [assigned locations due]} (comp/props this)]
     (comp/fragment
-     (mui/typography {:noWrap true} (str/join ", " (map ::account/name assigned)))
      (mui/typography {:noWrap true} (str/join ", " (map ::node/long-name locations)))
+     (mui/typography {:noWrap true} (str/join ", " (map ::account/name assigned)))
      (when due (mui/typography {} (str "Due by: " (tick/format
                                                    (tick.format/formatter "LLL d, yyyy HH:mm")
                                                    due)))))))
