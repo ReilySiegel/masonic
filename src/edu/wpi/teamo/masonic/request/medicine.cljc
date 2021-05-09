@@ -1,5 +1,6 @@
 (ns edu.wpi.teamo.masonic.request.medicine
   (:require [com.wsscode.pathom3.connect.operation :as pco]
+            [edu.wpi.teamo.masonic.request.drugs :as drugs]
             [edu.wpi.teamo.masonic.request :as request]
             [edu.wpi.teamo.masonic.account :as account]
             [edu.wpi.teamo.masonic.map.node :as node]
@@ -62,8 +63,10 @@
    (mui/grid {:item true
               :xs   12
               :sm   6}
-             (form/text-field this {::form/field ::type
-                                    ::form/label "Type"}))
+             (form/auto-complete this {::form/label     "Type"
+                                       ::form/field     ::type
+                                       ::form/free-solo true
+                                       ::form/options   drugs/list}))
    (mui/grid {:item true
               :xs   12
               :sm   6}

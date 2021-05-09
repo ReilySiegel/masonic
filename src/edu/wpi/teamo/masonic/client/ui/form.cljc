@@ -26,23 +26,35 @@
      :onBlur   (mark-complete! this field)
      :onChange #(m/set-string! this field :event %)})))
 
-(defn auto-complete [this {::keys [label field id-key label-fn options]
-                           :as    opts}]
+(defn auto-complete [this {::keys [label field id-key label-fn options multiple? free-solo]
+                           :as    opts
+                           :or    {id-key   identity
+                                   label-fn identity}}]
   (mui/auto-complete
    {:renderInput          #(mui/text-field
                             (mui/merge* % {:label  label
                                            :onBlur (mark-complete! this field)}))
-    :multiple             true
-    :value                (map id-key (this->field this field))
+    :multiple             multiple?
+    :value                (if multiple?
+                            (map id-key (this->field this field))
+                            (this->field this field))
     :onChange             (fn [_ v]
                             (m/set-value! this
                                           field
-                                          (mapv (partial conj [id-key])
-                                                (mui/->clj v))))
-    :disableCloseOnSelect true
+                                          (if multiple?
+                                            (mapv (partial conj [id-key])
+                                                  (mui/->clj v))
+                                            v)))
+    :disableCloseOnSelect multiple?
+    :disableClearable     true
+    :autoHighlight        true
+    :autoSelect           true
+    :freeSolo             free-solo
     :getOptionLabel       (fn [id]
-                            (let [option (first (filter (comp #{id} id-key) options))]
-                              (label-fn option)))
+                            (if (= identity id-key)
+                              id
+                              (let [option (first (filter (comp #{id} id-key) options))]
+                                (label-fn option))))
     :options              (or  (map id-key options) [])}))
 
 (defn date-time [this {::keys [label field]

@@ -83,16 +83,18 @@
         (comp/props this)]
     (comp/fragment
      (mui/grid {:item true :xs 12 :sm 6}
-               (form/auto-complete this {::form/label    "Assign"
-                                         ::form/field    ::assigned
-                                         ::form/id-key   ::account/username
-                                         ::form/options  accounts
-                                         ::form/label-fn ::account/name}))
+               (form/auto-complete this {::form/label     "Assign"
+                                         ::form/field     ::assigned
+                                         ::form/id-key    ::account/username
+                                         ::form/options   accounts
+                                         ::form/multiple? true
+                                         ::form/label-fn  ::account/name}))
      (mui/grid {:item true :xs 12 :sm 6}
-               (form/auto-complete this {::form/label   "Location"
-                                         ::form/field   ::locations
-                                         ::form/id-key  ::node/id
-                                         ::form/options nodes
+               (form/auto-complete this {::form/label     "Location"
+                                         ::form/field     ::locations
+                                         ::form/id-key    ::node/id
+                                         ::form/options   nodes
+                                         ::form/multiple? true
                                          ::form/label-fn
                                          (fn [node]
                                            (str (::node/long-name node) " (" (::node/id node) ")"))}))
