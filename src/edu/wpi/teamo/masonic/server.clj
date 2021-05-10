@@ -20,7 +20,7 @@
      [:link {:rel "stylesheet" :href "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"}]
      [:link {:rel "shortcut icon" :href "data:image/x-icon;," :type "image/x-icon"}]
      [:script (str "var fulcro_network_csrf_token = '" csrf-token "';")]]
-    [:body {:style "background-color: #2E3440"}
+    [:body {}
      [:div#app]
      [:script {:src "/js/main.js"}]]]))
 
