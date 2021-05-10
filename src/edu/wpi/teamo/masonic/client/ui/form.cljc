@@ -100,7 +100,8 @@
      (mui/button {:onClick #(comp/transact! this [(fs/reset-form!
                                                    {:form-ident ident})
                                                   `(m/toggle {:field :ui/open?})])} "Cancel")
-     (mui/button {:disabled (fs/invalid-spec? updated-props)
+     (mui/button {:disabled (or (not (fs/dirty? form-props))
+                                (fs/invalid-spec? updated-props))
                   :onClick
                   #(comp/transact! this [(upsert (select-keys form-props (fs/get-form-fields form)))
                                          `(m/toggle {:field :ui/open?})])} "Submit"))))
