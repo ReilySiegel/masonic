@@ -48,7 +48,6 @@
     :disableCloseOnSelect multiple?
     :disableClearable     true
     :autoHighlight        true
-    :autoSelect           true
     :freeSolo             free-solo
     :getOptionLabel       (fn [id]
                             (if (= identity id-key)
@@ -98,10 +97,9 @@
                        state-map)]
     (mui/dialog-actions
      {}
-     (mui/button {:disabled (not (fs/dirty? form-props))
-                  :onClick  #(comp/transact! this [(fs/reset-form!
-                                                    {:form-ident ident})
-                                                   `(m/toggle {:field :ui/open?})])} "Cancel")
+     (mui/button {:onClick #(comp/transact! this [(fs/reset-form!
+                                                   {:form-ident ident})
+                                                  `(m/toggle {:field :ui/open?})])} "Cancel")
      (mui/button {:disabled (fs/invalid-spec? updated-props)
                   :onClick
                   #(comp/transact! this [(upsert (select-keys form-props (fs/get-form-fields form)))

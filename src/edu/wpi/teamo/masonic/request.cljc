@@ -115,7 +115,8 @@
                  ::assigned  []
                  ::locations []
                  ::complete? false
-                 ::due       nil
+                 ::due       (tick/at (tick/tomorrow)
+                                      (tick/midnight))
                  ::details   ""}]
     (-> state 
         (update-in ident merge (merge request fields)))))

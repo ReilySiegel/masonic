@@ -99,7 +99,7 @@
     {:container true :spacing 4}
     (map card (sort-by (juxt ::request/complete? ::request/due) all)))
    (mui/fab {:color   :primary
-             :sx      {:position :absolute
+             :sx      {:position :fixed
                        :bottom   32
                        :right    32}
              :onClick #(comp/transact! this [(request/create {::request/form     Form
