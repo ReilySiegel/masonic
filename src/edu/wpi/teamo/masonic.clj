@@ -26,6 +26,7 @@
 (defn start!
   ([args] (start!))
   ([]
+   (println "Starting all Services...")
    (when @system
      (vswap! system ig/halt!))
    (vreset! system (ig/init config))))
@@ -33,12 +34,35 @@
 (defn start-headless!
   ([args] (start-headless!))
   ([]
+   (println "Starting Headless...")
    (when @system
      (vswap! system ig/halt!))
    (vreset! system (ig/init config [::server/http ::api/env]))))
 
+(defn start-mason!
+  ([args] (start-mason!))
+  ([]
+   (println "Starting App...")
+   (when @system
+     (vswap! system ig/halt!))
+   (vreset! system (ig/init config [::project-mason]))))
+
 (defn -main [& args]
-  (start!))
+  (let [mode  (first args)
+        modes "Valid service modes are [all, app, web]"]
+    (case mode
+      nil
+      (do (println "No service mode specified!")
+          (deref (::project-mason (start!))))
+      "app"
+      @(::project-mason (start-mason!))
+      "all"
+      @(::project-mason (start!))
+      "web"
+      (start-headless!)
+      "help"
+      (println "java -jar mason.jar [service-mode]\n" modes)
+      (println "Invalid service mode!\n" modes))))
 
 (comment
   (start!)

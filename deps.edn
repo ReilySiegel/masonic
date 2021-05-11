@@ -21,4 +21,4 @@
                      :exec-fn      hf.depstar/uberjar
                      :exec-args    {:aot        true
                                     :main-class edu.wpi.teamo.masonic
-                                    :jar        "masonic.jar"}}}}
+                                    :jar        "mason.jar"}}}}
