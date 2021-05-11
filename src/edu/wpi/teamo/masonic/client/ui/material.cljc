@@ -25,6 +25,7 @@
               ["@material-ui/icons/CleanHands" :default CleanHandsIcon]
               ["@material-ui/icons/Fastfood" :default FastfoodIcon]
               ["@material-ui/icons/Redeem" :default RedeemIcon]
+              ["@material-ui/icons/Security" :default SecurityIcon]
               ["@material-ui/icons/LightMode" :default LightModeIcon]
               ["@material-ui/icons/DarkMode" :default DarkModeIcon]
               ["@material-ui/lab/AdapterDateFns" :default AdapterDateFns]
@@ -94,6 +95,7 @@
 (def redeem-icon (interop/react-factory #?(:cljs RedeemIcon :clj nil)))
 (def light-mode-icon (interop/react-factory #?(:cljs LightModeIcon :clj nil)))
 (def dark-mode-icon (interop/react-factory #?(:cljs DarkModeIcon :clj nil)))
+(def security-icon (interop/react-factory #?(:cljs SecurityIcon :clj nil)))
 
 
 (def styles-provider (interop/react-factory #?(:cljs mui/StylesProvider :clj nil)))
