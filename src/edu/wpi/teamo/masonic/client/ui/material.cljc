@@ -23,6 +23,8 @@
               ["@material-ui/icons/LocalPharmacy" :default LocalPharmacyIcon]
               ["@material-ui/icons/LocalLaundryService" :default LocalLaundryServiceIcon]
               ["@material-ui/icons/CleanHands" :default CleanHandsIcon]
+              ["@material-ui/icons/Fastfood" :default FastfoodIcon]
+              ["@material-ui/icons/Redeem" :default RedeemIcon]
               ["@material-ui/lab/AdapterDateFns" :default AdapterDateFns]
               ["@material-ui/lab/LocalizationProvider" :default LocalizationProvider]])
    [com.fulcrologic.fulcro.algorithms.react-interop :as interop])
@@ -85,6 +87,8 @@
 (def local-pharmacy-icon (interop/react-factory #?(:cljs LocalPharmacyIcon :clj nil)))
 (def clean-hands-icon (interop/react-factory #?(:cljs CleanHandsIcon :clj nil)))
 (def local-laundry-service-icon (interop/react-factory #?(:cljs LocalLaundryServiceIcon :clj nil)))
+(def fast-food-icon (interop/react-factory #?(:cljs FastfoodIcon :clj nil)))
+(def redeem-icon (interop/react-factory #?(:cljs RedeemIcon :clj nil)))
 
 
 (def styles-provider (interop/react-factory #?(:cljs mui/StylesProvider :clj nil)))
