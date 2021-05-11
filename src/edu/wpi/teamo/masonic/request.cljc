@@ -25,32 +25,36 @@
               ::complete?
               ::details  
               ::due      
-              ::timestamp])
+              ::timestamp
+              ::account/username])
 
 #?(:clj
    (defn request->m
      [^ExtendedBaseRequest obj]
-     {::id        (.getID obj)
+     {::id               (.getID obj)
       ::locations
       (->> obj
            .getLocations
            .iterator
            iterator-seq
            (mapv (partial assoc {} ::node/id)))
-      ::assigned  (mapv (partial assoc {} ::account/username) (str/split (.getAssigned obj) #","))
-      ::complete? (.isComplete obj)
-      ::details   (.getDetails obj)
-      ::due       (.getDue obj)
-      ::timestamp (.getTimestamp obj)}))
+      ::assigned         (mapv (partial assoc {} ::account/username) (str/split (.getAssigned obj) #","))
+      ::complete?        (.isComplete obj)
+      ::details          (.getDetails obj)
+      ::due              (.getDue obj)
+      ::timestamp        (.getTimestamp obj)
+      ::account/username (.getUser obj)}))
 
 #?(:clj
-   (defn ->BaseRequest [{::keys [id details locations assigned complete? due]}]
+   (defn ->BaseRequest [{::keys         [id details locations assigned complete? due]
+                         ::account/keys [username]}]
      (BaseRequest. id
                    details
                    (.stream (map ::node/id locations))
                    (str/join \, (map ::account/username assigned))
                    complete?
-                   due)))
+                   due
+                   username)))
 
 
 (comp/defsc FormAccountsQuery [_ _]
@@ -63,13 +67,14 @@
    :ident       ::node/id
    :form-fields #{::node/id}})
 
-(def form-query [::id ::details ::due ::complete? fs/form-config-join
+(def form-query [::id ::details ::due ::complete? ::account/username
+                 fs/form-config-join
                  {::locations (comp/get-query FormNodesQuery)}
                  {::assigned (comp/get-query FormAccountsQuery)}
                  {[::account/all '_] (comp/get-query FormAccountsQuery)}
                  {[::node/all '_] (comp/get-query FormNodesQuery)}])
 
-(def form-fields #{::id ::assigned ::locations ::complete? ::details ::due})
+(def form-fields #{::id ::assigned ::locations ::complete? ::details ::due ::account/username})
 
 (defn form-did-mount [this {accounts ::account/all
                             nodes    ::node/all}]
@@ -111,13 +116,14 @@
 
 (defn add-form* [state id fields]
   (let [ident   [::id id]
-        request {::id        id
-                 ::assigned  []
-                 ::locations []
-                 ::complete? false
-                 ::due       (tick/at (tick/tomorrow)
-                                      (tick/midnight))
-                 ::details   ""}]
+        request {::id               id
+                 ::assigned         []
+                 ::locations        []
+                 ::complete?        false
+                 ::due              (tick/at (tick/tomorrow)
+                                             (tick/midnight))
+                 ::details          ""
+                 ::account/username ""}]
     (-> state 
         (update-in ident merge (merge request fields)))))
 

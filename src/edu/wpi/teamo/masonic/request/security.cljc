@@ -36,7 +36,6 @@
    (pco/defmutation upsert [{::keys         [emergency?]
                              ::request/keys [id]
                              :as            req}]
-     (prn req)
      (.update (SecurityRequest. emergency? (request/->BaseRequest req)))
      {::request/id id})
    :cljs
