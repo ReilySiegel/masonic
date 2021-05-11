@@ -8,6 +8,7 @@
             [edu.wpi.teamo.masonic.map.node :as node]
             [edu.wpi.teamo.masonic.request.food :as food]
             [edu.wpi.teamo.masonic.request.gift :as gift]
+            [edu.wpi.teamo.masonic.request.interpreter :as interpreter]
             [edu.wpi.teamo.masonic.request.laundry :as laundry]
             [edu.wpi.teamo.masonic.request.medicine :as medicine]
             [edu.wpi.teamo.masonic.request.sanitation :as sanitation]
@@ -21,7 +22,7 @@
 (defmethod ig/init-key ::env [_ {}]
   (-> (pci/register [node/all node/by-id edge/all edge/by-id map/db medicine/all medicine/upsert
                      sanitation/all sanitation/upsert laundry/all food/upsert food/all gift/upsert
-                     gift/all security/all security/upsert
+                     gift/all security/all security/upsert interpreter/all interpreter/upsert
                      laundry/upsert account/by-username account/all account/full-name session/login])
       (p.connector/connect-env {::pvc/parser-id ::env})))
 

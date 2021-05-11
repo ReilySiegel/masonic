@@ -26,6 +26,7 @@
               ["@material-ui/icons/Fastfood" :default FastfoodIcon]
               ["@material-ui/icons/Redeem" :default RedeemIcon]
               ["@material-ui/icons/Security" :default SecurityIcon]
+              ["@material-ui/icons/Translate" :default TranslateIcon]
               ["@material-ui/icons/LightMode" :default LightModeIcon]
               ["@material-ui/icons/DarkMode" :default DarkModeIcon]
               ["@material-ui/lab/AdapterDateFns" :default AdapterDateFns]
@@ -96,6 +97,7 @@
 (def light-mode-icon (interop/react-factory #?(:cljs LightModeIcon :clj nil)))
 (def dark-mode-icon (interop/react-factory #?(:cljs DarkModeIcon :clj nil)))
 (def security-icon (interop/react-factory #?(:cljs SecurityIcon :clj nil)))
+(def translate-icon (interop/react-factory #?(:cljs TranslateIcon :clj nil)))
 
 
 (def styles-provider (interop/react-factory #?(:cljs mui/StylesProvider :clj nil)))
