@@ -34,16 +34,16 @@
    :components 
    {:MuiIconButton
     {:styleOverrides
-     {:root {:transition "color 250ms"}}}
+     {:root {:transition "color 1000ms"}}}
     :MuiTypography
     {:styleOverrides
-     {:root {:transition "color 250ms"}}}
+     {:root {:transition "color 1000ms"}}}
     :MuiPaper
     {:styleOverrides
-     {:root {:transition "background-color 250ms"}}}
+     {:root {:transition "background-color 1000ms"}}}
     :MuiCssBaseline
     {:styleOverrides
-     {:body (merge {:transition "background-color 250ms"}
+     {:body (merge {:transition "background-color 1000ms"}
                    (js->clj
                     (m/dark-scrollbar (if (= :light mode)
                                         {:track  "#E5E9F0"
