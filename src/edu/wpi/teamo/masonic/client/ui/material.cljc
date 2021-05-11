@@ -25,8 +25,11 @@
               ["@material-ui/icons/CleanHands" :default CleanHandsIcon]
               ["@material-ui/icons/Fastfood" :default FastfoodIcon]
               ["@material-ui/icons/Redeem" :default RedeemIcon]
+              ["@material-ui/icons/LightMode" :default LightModeIcon]
+              ["@material-ui/icons/DarkMode" :default DarkModeIcon]
               ["@material-ui/lab/AdapterDateFns" :default AdapterDateFns]
-              ["@material-ui/lab/LocalizationProvider" :default LocalizationProvider]])
+              ["@material-ui/lab/LocalizationProvider" :default LocalizationProvider]
+              ["@material-ui/core/darkScrollbar" :default darkScrollbar]])
    [com.fulcrologic.fulcro.algorithms.react-interop :as interop])
   (:refer-clojure :exclude [list]))
 
@@ -89,12 +92,15 @@
 (def local-laundry-service-icon (interop/react-factory #?(:cljs LocalLaundryServiceIcon :clj nil)))
 (def fast-food-icon (interop/react-factory #?(:cljs FastfoodIcon :clj nil)))
 (def redeem-icon (interop/react-factory #?(:cljs RedeemIcon :clj nil)))
+(def light-mode-icon (interop/react-factory #?(:cljs LightModeIcon :clj nil)))
+(def dark-mode-icon (interop/react-factory #?(:cljs DarkModeIcon :clj nil)))
 
 
 (def styles-provider (interop/react-factory #?(:cljs mui/StylesProvider :clj nil)))
 (def theme-provider (interop/react-factory  #?(:cljs styles/ThemeProvider :clj nil)))
 (def create-mui-theme #?(:cljs (comp styles/createMuiTheme clj->js) :clj nil))
 (def fade #?(:cljs styles/fade :clj nil))
+(def dark-scrollbar #?(:cljs (comp darkScrollbar clj->js) :clj nil))
 
 (defn make-styles [f]
   #?(:cljs (comp

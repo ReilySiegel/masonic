@@ -8,6 +8,12 @@
             [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
             [com.fulcrologic.fulcro.application :as app]))
 
+(m/defmutation toggle-theme [_]
+  (action [{:keys [state]}]
+          (if (= :light (:ui/theme @state))
+            (swap! state assoc :ui/theme :dark)
+            (swap! state assoc :ui/theme :light))))
+
 (defn routes []
   (->> router/Router
        comp/component-options
@@ -33,9 +39,10 @@
 (def ui-busy (comp/factory Busy))
 
 
-(comp/defsc AppBar [this {:ui/keys [open?]
+(comp/defsc AppBar [this {:ui/keys [open? theme]
                           ::keys   [busy]}]
   {:query         [:ui/open?
+                   [:ui/theme '_]
                    {::busy (comp/get-query Busy)}]
    :ident         (fn [] [:ui/component ::bar])
    :initial-state {:ui/open? false
@@ -52,7 +59,11 @@
                        :color   :inherit
                        :onClick #(m/toggle! this :ui/open?)}
                       (mui/menu-icon {}))
-     (mui/typography {} "Masonic"))
+     (mui/typography {:sx {:flexGrow 1}} "Masonic")
+     (mui/icon-button
+      {:onClick #(comp/transact! this [(toggle-theme)])}
+      (theme {:dark  (mui/light-mode-icon {})
+              :light (mui/dark-mode-icon {})})))
     (ui-busy busy)
     (mui/drawer
      {:open    open?
