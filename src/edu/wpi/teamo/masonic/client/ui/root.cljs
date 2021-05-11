@@ -32,15 +32,26 @@
                                    :default "#2E3440"}})
                    {:mode mode})
    :components 
-   {:MuiCssBaseline
+   {:MuiIconButton
     {:styleOverrides
-     {:body (m/dark-scrollbar (if (= :light mode)
-                                {:track  "#E5E9F0"
-                                 :thumb  "#D8DEE9"
-                                 :active "#D8DEE9"}
-                                {:track  "#3B4252"
-                                 :thumb  "#4C566A"
-                                 :active "#4C566A"}))}}}})
+     {:root {:transition "color 250ms"}}}
+    :MuiTypography
+    {:styleOverrides
+     {:root {:transition "color 250ms"}}}
+    :MuiPaper
+    {:styleOverrides
+     {:root {:transition "background-color 250ms"}}}
+    :MuiCssBaseline
+    {:styleOverrides
+     {:body (merge {:transition "background-color 250ms"}
+                   (js->clj
+                    (m/dark-scrollbar (if (= :light mode)
+                                        {:track  "#E5E9F0"
+                                         :thumb  "#D8DEE9"
+                                         :active "#D8DEE9"}
+                                        {:track  "#3B4252"
+                                         :thumb  "#4C566A"
+                                         :active "#4C566A"}))))}}}})
 
 (comp/defsc Root [this {::bar/keys      [bar]
                         ::medicine/keys [page]
