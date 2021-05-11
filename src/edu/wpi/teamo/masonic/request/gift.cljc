@@ -17,6 +17,8 @@
             [clojure.spec.alpha :as s])
   #?(:clj (:import edu.wpi.teamo.database.request.GiftRequest)))
 
+(s/def ::recipient ::specs/non-empty-string)
+
 (def defaults {::recipient   ""
                ::tracking-id ""})
 

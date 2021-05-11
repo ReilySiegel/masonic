@@ -26,7 +26,7 @@
      :onBlur   (mark-complete! this field)
      :onChange #(m/set-string! this field :event %)})))
 
-(defn auto-complete [this {::keys [label field id-key label-fn options multiple? free-solo]
+(defn auto-complete [this {::keys [label field id-key label-fn options multiple?]
                            :as    opts
                            :or    {id-key   identity
                                    label-fn identity}}]
@@ -48,7 +48,6 @@
     :disableCloseOnSelect multiple?
     :disableClearable     true
     :autoHighlight        true
-    :freeSolo             free-solo
     :getOptionLabel       (fn [id]
                             (if (= identity id-key)
                               id

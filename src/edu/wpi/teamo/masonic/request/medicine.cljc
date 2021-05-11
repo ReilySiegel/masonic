@@ -63,10 +63,9 @@
    (mui/grid {:item true
               :xs   12
               :sm   6}
-             (form/auto-complete this {::form/label     "Type"
-                                       ::form/field     ::type
-                                       ::form/free-solo true
-                                       ::form/options   drugs/list}))
+             (form/auto-complete this {::form/label   "Type"
+                                       ::form/field   ::type
+                                       ::form/options drugs/list}))
    (mui/grid {:item true
               :xs   12
               :sm   6}

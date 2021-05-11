@@ -17,6 +17,8 @@
             [clojure.spec.alpha :as s])
   #?(:clj (:import edu.wpi.teamo.database.request.InterpreterRequest)))
 
+(s/def ::language ::specs/non-empty-string)
+
 (def defaults {::language ""
                ::type     ""})
 
@@ -82,7 +84,7 @@
      {}
      (mui/card-content
       {}
-      (when language (mui/typography {}  (str language " - " type)))
+      (mui/typography {}  (str/join  " - " (remove str/blank? [language type])))
       (request/card-elements this))))))
 
 (def card (comp/factory Card {:keyfn ::request/id}))
